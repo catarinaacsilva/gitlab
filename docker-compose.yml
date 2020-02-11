@@ -13,8 +13,8 @@ services:
             - POSTGRES_DB=gitlabdb
 
         networks:
-            - eventos
-        container_name: database_eventos
+            - gitlab
+        container_name: database_gitlab
     web:
       image: 'gitlab/gitlab-ce:latest'
       restart: always
