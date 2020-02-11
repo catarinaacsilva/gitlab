@@ -14,15 +14,16 @@ You can easily configure and deploy your Docker-based GitLab installation in a s
 
 1. Create a Docker-compose.yml
 
-2. 
+2. Run `docker-compose up`
 
-**Potencial problema:** ACLs
+**Potencial problems:** ACLs
 
 
 ## Setup a Docker swarm
 
 [Docker swarm](https://docs.docker.com/engine/swarm/swarm-tutorial/)
 [docker swarm](https://docs.gitlab.com/omnibus/docker/#run-the-image)
+
 
 
 ## Extra information
