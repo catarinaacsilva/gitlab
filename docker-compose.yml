@@ -1,17 +1,19 @@
-version: "3.6"
-  web:
-    image: 'gitlab/gitlab-ce:latest'
-    restart: always
-    hostname: localhost
-    environment:
-      GITLAB_OMNIBUS_CONFIG: |
-        external_url 'https://gitlab.example.com'
-        /gitlab.rb
-    ports:
-      - '80:80'
-      #- '443:443'
-      #- '22:22'
-    volumes:
-      - '/srv/gitlab/config:/etc/gitlab'
-      - '/srv/gitlab/logs:/var/log/gitlab'
-      - '/srv/gitlab/data:/var/opt/gitlab'
+version: '3.6'
+
+services:
+    web:
+      image: 'gitlab/gitlab-ce:latest'
+      restart: always
+      hostname: localhost
+      environment:
+        GITLAB_OMNIBUS_CONFIG: |
+          external_url 'https://gitlab.example.com'
+          /gitlab.rb
+      ports:
+        - '80:80'
+          #- '443:443'
+          #- '22:22'
+      volumes:
+        - '/srv/gitlab/config:/etc/gitlab'
+        - '/srv/gitlab/logs:/var/log/gitlab'
+        - '/srv/gitlab/data:/var/opt/gitlab'
