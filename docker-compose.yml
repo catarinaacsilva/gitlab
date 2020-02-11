@@ -11,8 +11,6 @@ services:
           - POSTGRES_USER=admin
           - POSTGRES_PASSWORD=gitlabadmin
           - POSTGRES_DB=gitlabdb
-      networks:
-          - gitlab
       container_name: database_gitlab
     web:
       image: 'gitlab/gitlab-ce:latest'
