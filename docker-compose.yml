@@ -2,19 +2,18 @@ version: '3.6'
 
 services:    
     db:
-        restart: always
-        image: launcher.gcr.io/google/postgresql10
-        volumes:
-            - ./postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-            - ./backups/postrgresql:/backup
-        environment:
-            - POSTGRES_USER=admin
-            - POSTGRES_PASSWORD=gitlabadmin
-            - POSTGRES_DB=gitlabdb
-
-        networks:
-            - gitlab
-        container_name: database_gitlab
+      restart: always
+      image: launcher.gcr.io/google/postgresql10
+      volumes:
+          - ./postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+          - ./backups/postrgresql:/backup
+      environment:
+          - POSTGRES_USER=admin
+          - POSTGRES_PASSWORD=gitlabadmin
+          - POSTGRES_DB=gitlabdb
+      networks:
+          - gitlab
+      container_name: database_gitlab
     web:
       image: 'gitlab/gitlab-ce:latest'
       restart: always
