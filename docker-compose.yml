@@ -1,6 +1,20 @@
 version: '3.6'
 
-services:
+services:    
+    db:
+        restart: always
+        image: launcher.gcr.io/google/postgresql10
+        volumes:
+            - ./postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+            - ./backups/postrgresql:/backup
+        environment:
+            - POSTGRES_USER=admin
+            - POSTGRES_PASSWORD=gitlabadmin
+            - POSTGRES_DB=gitlabdb
+
+        networks:
+            - eventos
+        container_name: database_eventos
     web:
       image: 'gitlab/gitlab-ce:latest'
       restart: always
@@ -8,7 +22,7 @@ services:
       environment:
         GITLAB_OMNIBUS_CONFIG: |
           external_url 'https://gitlab.example.com'
-          /gitlab.rb
+          gitlab.rb
       ports:
         - '80:80'
           #- '443:443'
