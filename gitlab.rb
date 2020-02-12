@@ -1,4 +1,4 @@
-external_url 'https://gitlab.example.com'
+#external_url 'https://gitlab.example.com'
 
 # Prevent GitLab from starting if NFS data mounts are not available
 high_availability['mountpoint'] = '/var/opt/gitlab/git-data'
@@ -7,16 +7,18 @@ high_availability['mountpoint'] = '/var/opt/gitlab/git-data'
 roles ['application_role']
 nginx['enable'] = true
 
-# PostgreSQL connection details
+#TODO: Confirm details about postgres: db_host and adapter
+# PostgreSQL connection details 
 gitlab_rails['db_adapter'] = 'postgresql'
 gitlab_rails['db_encoding'] = 'unicode'
-gitlab_rails['db_host'] = '10.1.0.5' # IP/hostname of database server
-gitlab_rails['db_password'] = 'DB password'
+gitlab_rails['db_host'] = '10.1.0.5' # IP/hostname of database server  
+gitlab_rails['db_port'] = 5432
+gitlab_rails['db_password'] = 'passworddb'
 
 # Redis connection details
 gitlab_rails['redis_port'] = '6379'
 gitlab_rails['redis_host'] = '10.1.0.6' # IP/hostname of Redis server
-gitlab_rails['redis_password'] = 'Redis Password'
+gitlab_rails['redis_password'] = 'passwordredis'
 
 # Ensure UIDs and GIDs match between servers for permissions via NFS
 user['uid'] = 9000
