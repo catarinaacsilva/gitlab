@@ -1,39 +1,37 @@
 version: '3.6'
 
 services:
-    redis:
-      restart: always
-      image: sameersbn/redis:4.0.9-2
-      command: 
-          - --loglevel warning
-      volumes:
-          - redis-data:/var/lib/redis:Z
+    #redis:
+      #restart: always
+      #image: sameersbn/redis:4.0.9-2
+      #command: 
+         # - --loglevel warning
+      #volumes:
+         # - redis-data:/var/lib/redis:Z
 
-    db:
-      restart: always
-      image: launcher.gcr.io/google/postgresql10
-      volumes:
-          - ./postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-          - ./backups/postrgresql:/backup
-      environment:
-          - POSTGRES_USER=admin
-          - POSTGRES_PASSWORD=gitlabadmin
-          - POSTGRES_DB=gitlabdb
-      container_name: database_gitlab
+    #db:
+      #restart: always
+      #image: launcher.gcr.io/google/postgresql10
+      #volumes:
+          #- ./postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+          #- ./backups/postrgresql:/backup
+      #environment:
+          #- POSTGRES_USER=admin
+          #- POSTGRES_PASSWORD=gitlabadmin
+          #- POSTGRES_DB=gitlabdb
+      #container_name: database_gitlab
   
     web:
       image: 'gitlab/gitlab-ce:latest'
       restart: always
       hostname: localhost
-      environment:
-        GITLAB_OMNIBUS_CONFIG: |
+      #environment:
+        #GITLAB_OMNIBUS_CONFIG: |
           # external_url 'https://gitlab.example.com'
-          gitlab.rb
+          #gitlab.rb
       ports:
-        - '80:80'
-          #- '443:443'
-          #- '22:22'
+        - '8080:80'
       volumes:
-        - '/srv/gitlab/config:/etc/gitlab'
-        - '/srv/gitlab/logs:/var/log/gitlab'
-        - '/srv/gitlab/data:/var/opt/gitlab'
+        - './gitlab/config:/etc/gitlab'
+        - './gitlab/logs:/var/log/gitlab'
+        - './gitlab/data:/var/opt/gitlab'
