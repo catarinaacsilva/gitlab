@@ -16,13 +16,6 @@ data = {
             'action': 'create',
             'file_path': 'README.rst',
             'content': open('path/to/file.rst').read(),
-        },
-        {
-            # Binary files need to be base64 encoded
-            'action': 'create',
-            'file_path': 'logo.png',
-            'content': base64.b64encode(open('logo.png').read()),
-            'encoding': 'base64',
         }
     ]
 }

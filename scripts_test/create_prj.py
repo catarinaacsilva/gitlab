@@ -2,7 +2,7 @@ import gitlab
 
 gl = gitlab.Gitlab('http://localhost:8000', private_token='e7NNphfyD6HKTbsBPygx')
 
-# create a new user
+# create a new project
 for u in range(5):
     usr = 'usr0'
     user = gl.users.list(username=usr)[0]
