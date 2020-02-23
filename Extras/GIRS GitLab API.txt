@@ -1,0 +1,6 @@
+Getting started with the API - https://python-gitlab.readthedocs.io/en/stable/api-usage.html
+Python GitLab API - https://python-gitlab.readthedocs.io/en/stable/gl_objects/projects.html
+Users API - https://docs.gitlab.com/ee/api/users.html
+Projects API - https://docs.gitlab.com/ee/api/projects.html
+Repository files API - https://docs.gitlab.com/ee/api/repository_files.html
+

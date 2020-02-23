@@ -12,7 +12,7 @@ In this project was used:
 It provides a Git-repository manager. So, It offers free unlimited (private) repositories and unlimited collaborators. 
 
 **PostgreSQL**
-It  is a free and open-source relational database management system (RDBMS) emphasizing extensibility and technical standards compliance.
+It is a free and open-source relational database management system (RDBMS) emphasizing extensibility and technical standards compliance.
 
 **Redis**
 Redis is an open-source, networked, in-memory, key-value data store with optional durability. It works like a cache.
