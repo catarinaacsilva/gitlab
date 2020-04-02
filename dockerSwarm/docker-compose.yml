@@ -1,0 +1,72 @@
+version: 3.6
+services:
+  db:
+    restart: always
+    image: launcher.gcr.io/google/postgresql10
+    volumes:
+      - ./postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ./backups/postrgresql:/backup
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=gitlabadmin
+      - POSTGRES_DB=gitlabdb
+    networks:
+      - gitlab_db
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+    container_name: database_gitlab  
+
+  redis:
+    image:
+    ports:
+    volumes:
+    secrets:
+
+  sidekiq:
+    image:
+    ports:
+    volumes:
+    secrets:
+
+  nginx:
+    image:
+    ports:
+    volumes:
+    secrets:
+  prometheus:
+    image:
+    ports:
+    volumes:
+    secrets:
+
+  gitLabRunner:
+    image:
+    ports:
+    volumes:
+    secrets:
+
+  unicornWorkers:
+    image:
+    ports:
+    volumes:
+    secrets:
+
+  gitLabWorkhorse:
+    image:
+    ports:
+    volumes:
+    secrets:
+    
+  gitaly:
+    image:
+    ports:
+    volumes:
+    secrets:
+
+
+networks:
+    gitlab_db:
+        driver: bridge
+        ipam:
+            config:
+                - subnet: IP/MASK --> TODO
