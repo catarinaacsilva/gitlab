@@ -20,7 +20,6 @@ services:
         traefik.port: "80"
         traefik.frontend.rule: "Host:gitlab.localtest.me"
         traefik.docker.network: "proxy"
-
   redis:
     image: "redis:4.0.6-alpine"
   postgres:
@@ -47,6 +46,22 @@ services:
         traefik.port: 9090
         traefik.frontend.rule: "Host:prometheus.localtest.me"
         traefik.docker.network: "proxy"
+    grafana:
+      image: "grafana/grafana:4.6.3"
+      environment:
+        GF_PATHS_CONFIG: "/grafana.ini"
+      configs:
+        - grafana.ini
+      volumes:
+        - "grafana_data:/data"
+      networks:
+        - default
+        - proxy
+      deploy:
+        labels:
+          traefik.port: 3000
+          traefik.frontend.rule: "Host:grafana.localtest.me"
+          traefik.docker.network: "proxy"
 
   volumes:
     gitlab_data:
@@ -80,12 +95,20 @@ services:
         type: nfs4
         o: "addr=127.0.0.1"
         device: ":/gitlab-swarm/prometheus"
+    grafana_data:
+      driver: local
+      driver_opts:
+        type: nfs4
+        o: "addr=127.0.0.1"
+        device: ":/gitlab-swarm/grafana"
 
   configs:
     gitlab.rb:
       file: "./gitlab.rb"
     prometheus.yaml:
       file: "./prometheus.yaml"
+    grafana.ini:
+      file: "./grafana.ini"
 
 
   networks:
