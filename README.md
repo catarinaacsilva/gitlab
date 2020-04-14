@@ -101,7 +101,21 @@ umount /var/tmp/test-nfs
 
 **Building the stack**
 
-1. Create the configuration files for the services we are deploying.
+1. Create the configuration files for the services we are deploying. The first one is for Gitlab itself (gitlab.rb).
+
+2. The Prometheus configuration file to setup metrics collection from gitlab
+
+3. The Grafana configuration file
+
+**Services**
+
+1. Now we can start defining the services of our stack. Let's begin with Gitlab itself: stack.yml
+
+**Deploying the stack**
+
+1. `docker stack deploy -c stack.yaml gitlab`
+
+2. And if you access `gitlab.localtest.me` you get to our Gitlab instance running on Docker Swarm.
 
 
 
