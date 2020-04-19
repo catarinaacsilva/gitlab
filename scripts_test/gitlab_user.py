@@ -34,16 +34,25 @@ class GitlabUser:
     def get_all_users(self):
         return self.gl.user.list()
 
+    # delete a user
+    def delete_user(self):
+        self.user.delete()
+
     # create a new project
     def create_prj(self, project_name: str):
         self.user.projects.create({'name': project_name})
+
+    # delete a project
+    def delete_prj(self, project_name: str):
+        project = self.gl.projects.list(search=str)
+        project.delete()
 
     # list all projects
     def get_all_projects(self):
         return self.user.projects.list()
 
     # TODO: Mudar o nome do caminho do ficheiro base
-    def commit(self, project_name: str):
+    def commit(self, project_name: str, file_path: str, content: str):
         project = None
         for p in self.user.projects.list():
             if p.name == project_name:
@@ -56,10 +65,9 @@ class GitlabUser:
             'actions': [
                 {
                     'action': 'create',
-                    'file_path': 'README.rst',
-                    'content': open('path/to/file.rst').read(),
+                    'file_path': file_path,
+                    'content': open(content).read(),
                 }
             ]
         }
         commit = project.commits.create(data)
-        # print(commit) -- Opcional
