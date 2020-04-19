@@ -3,14 +3,26 @@ version: "3.8"
 services:
   traefik:
     image: traefik:latest
-    command: --providers.docker.swarmmode --api.dashboard=true --api.insecure=true --log.level=DEBUG
+    command:
+      - '--api.dashboard=true' 
+      - '--api.insecure=true'
+      - '--providers.docker=true'
+      - '--providers.docker.swarmMode=true'
+      - '--providers.docker.exposedbydefault=false'
+      - '--entryPoints.web.address=:80'
+      - '--providers.docker.watch=true'
+      
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
     networks:
       - proxy
     ports:
-      - "80:80"
-      - "8080:8080"
+      - 80:80
+      - 8080:8080
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
 
 networks:
   proxy:

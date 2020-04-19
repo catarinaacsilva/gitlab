@@ -2,37 +2,38 @@ version: "3.8"
 
 services:
   gitlab:
-    image: "gitlab/gitlab-ce:10.3.3-ce.0"
+    image: gitlab/gitlab-ce:latest
     volumes:
-      - "gitlab_data:/var/opt/gitlab"
-      - "gitlab_logs:/var/log/gitlab"
-      - "gitlab_config:/etc/gitlab"
+      - gitlab_data:/var/opt/gitlab
+      - gitlab_logs:/var/log/gitlab
+      - gitlab_config:/etc/gitlab
     ports:
-      - "2222:22"
+      - 2222:22
+      - 80:80
     configs:
-      - source: "gitlab.rb"
-        target: "/etc/gitlab/gitlab.rb"
+      - source: gitlab.rb
+        target: /etc/gitlab/gitlab.rb
     networks:
       - default
       - proxy
     deploy:
       labels:
-        traefik.port: "80"
-        traefik.frontend.rule: "Host:gitlab.localtest.me"
-        traefik.docker.network: "proxy"
+        - traefik.enable=true
+        - traefik.http.routers.gitlab.entrypoints=web
+        - traefik.http.services.gitlab.loadbalancer.server.port=80
   redis:
-    image: "redis:4.0.6-alpine"
+    image: redis:5.0.8-alpine
   postgres:
-    image: "postgres:10.1-alpine"
+    image: postgres:12.2-alpine
     volumes:
-      - "postgres_data:/data"
+      - postgres_data:/data
     environment:
       POSTGRES_USER: gitlab
       POSTGRES_PASSWORD: gitlab
       PGDATA: /data
       POSTGRES_DB: gitlab
   prometheus:
-    image: "prom/prometheus:v2.0.0"
+    image: prom/prometheus:v2.17.1
     command: "--config.file=/prometheus.yaml --storage.tsdb.path /data"
     volumes:
       - "prometheus_data:/data"
@@ -41,76 +42,78 @@ services:
     networks:
       - default
       - proxy
+    ports:
+     - 9090:9090
     deploy:
       labels:
-        traefik.port: 9090
-        traefik.frontend.rule: "Host:prometheus.localtest.me"
-        traefik.docker.network: "proxy"
-    grafana:
-      image: "grafana/grafana:4.6.3"
-      environment:
-        GF_PATHS_CONFIG: "/grafana.ini"
-      configs:
-        - grafana.ini
-      volumes:
-        - "grafana_data:/data"
-      networks:
-        - default
-        - proxy
-      deploy:
-        labels:
-          traefik.port: 3000
-          traefik.frontend.rule: "Host:grafana.localtest.me"
-          traefik.docker.network: "proxy"
+        - traefik.enable=true
+        - traefik.http.routers.prometheus.entrypoints=web
+        - traefik.http.services.prometheus.loadbalancer.server.port=9090
+  grafana:
+    image: "grafana/grafana:5.4.3"
+    environment:
+      GF_PATHS_CONFIG: "/grafana.ini"
+    configs:
+      - grafana.ini
+    volumes:
+      - "grafana_data:/data"
+    networks:
+      - default
+      - proxy
+    ports:
+      - 3000:3000
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.grafana.entrypoints=web
+        - traefik.http.services.grafana.loadbalancer.server.port=3000
 
-  volumes:
-    gitlab_data:
-      driver: local
-      driver_opts:
-        type: nfs4
-        o: "addr=127.0.0.1"
-        device: ":/gitlab-swarm/gitlab/data"
-    gitlab_logs:
-      driver: local
-      driver_opts:
-        type: nfs4
-        o: "addr=127.0.0.1"
-        device: ":/gitlab-swarm/gitlab/logs"
-    gitlab_config:
-      driver: local
-      driver_opts:
-        type: nfs4
-        o: "addr=127.0.0.1"
-        device: ":/gitlab-swarm/gitlab/config"
+volumes:
+  gitlab_data:
+    driver: local
+    driver_opts:
+      type: nfs4
+      o: "addr=192.168.85.141"
+      device: ":/gitlab-swarm/gitlab/data"
+  gitlab_logs:
+    driver: local
+    driver_opts:
+      type: nfs4
+      o: "addr=192.168.85.141"
+      device: ":/gitlab-swarm/gitlab/logs"
+  gitlab_config:
+    driver: local
+    driver_opts:
+      type: nfs4
+      o: "addr=192.168.85.141"
+      device: ":/gitlab-swarm/gitlab/config"
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: nfs4
+      o: "addr=192.168.85.141"
+      device: :/gitlab-swarm/postgres 
+  prometheus_data:
+    driver: local
+    driver_opts:
+      type: nfs4
+      o: "addr=192.168.85.141"
+      device: ":/gitlab-swarm/prometheus"
+  grafana_data:
+    driver: local
+    driver_opts:
+      type: nfs4
+      o: "addr=192.168.85.141"
+      device: ":/gitlab-swarm/grafana"
 
-    postgres_data:
-      driver: local
-      driver_opts:
-        type: nfs4
-        o: "addr=127.0.0.1"
-        device: :/gitlab-swarm/postgres
-    prometheus_data:
-      driver: local
-      driver_opts:
-        type: nfs4
-        o: "addr=127.0.0.1"
-        device: ":/gitlab-swarm/prometheus"
-    grafana_data:
-      driver: local
-      driver_opts:
-        type: nfs4
-        o: "addr=127.0.0.1"
-        device: ":/gitlab-swarm/grafana"
+configs:
+  gitlab.rb:
+    file: "./gitlab.rb"
+  prometheus.yaml:
+    file: "./prometheus.yml"
+  grafana.ini:
+    file: "./grafana.ini"
 
-  configs:
-    gitlab.rb:
-      file: "./gitlab.rb"
-    prometheus.yaml:
-      file: "./prometheus.yaml"
-    grafana.ini:
-      file: "./grafana.ini"
-
-
-  networks:
-    proxy:
-      external: true     
+networks:
+  proxy:
+    external: true
