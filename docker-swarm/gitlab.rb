@@ -26,6 +26,6 @@ gitlab_rails['redis_host'] = "redis"
 
 # Prometheus exporters
 node_exporter['listen_address'] = '0.0.0.0:9100'
-gitlab_monitor['listen_address'] = '0.0.0.0'
+gitlab_exporter['listen_address'] = '0.0.0.0'
 gitaly['prometheus_listen_addr'] = "0.0.0.0:9236"
 gitlab_workhorse['prometheus_listen_addr'] = "0.0.0.0:9229"

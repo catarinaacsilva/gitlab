@@ -8,19 +8,14 @@ services:
       - gitlab_logs:/var/log/gitlab
       - gitlab_config:/etc/gitlab
     ports:
-      - 2222:22
-      - 80:80
+      - 5122:22
+      - 5100:80
     configs:
       - source: gitlab.rb
         target: /etc/gitlab/gitlab.rb
     networks:
       - default
-      - proxy
-    deploy:
-      labels:
-        - traefik.enable=true
-        - traefik.http.routers.gitlab.entrypoints=web
-        - traefik.http.services.gitlab.loadbalancer.server.port=80
+      - gitlab_p2
   redis:
     image: redis:5.0.8-alpine
   postgres:
@@ -41,14 +36,10 @@ services:
       - prometheus.yaml
     networks:
       - default
-      - proxy
+      - gitlab_p2
     ports:
-     - 9090:9090
-    deploy:
-      labels:
-        - traefik.enable=true
-        - traefik.http.routers.prometheus.entrypoints=web
-        - traefik.http.services.prometheus.loadbalancer.server.port=9090
+     - 5190:9090
+    user: "root:root"
   grafana:
     image: "grafana/grafana:5.4.3"
     environment:
@@ -59,52 +50,47 @@ services:
       - "grafana_data:/data"
     networks:
       - default
-      - proxy
+      - gitlab_p2
     ports:
-      - 3000:3000
-    deploy:
-      labels:
-        - traefik.enable=true
-        - traefik.http.routers.grafana.entrypoints=web
-        - traefik.http.services.grafana.loadbalancer.server.port=3000
+      - 5130:3000
 
 volumes:
   gitlab_data:
     driver: local
     driver_opts:
-      type: nfs4
-      o: "addr=192.168.85.141"
-      device: ":/gitlab-swarm/gitlab/data"
+      type: nfs
+      o: "addr=srv2-deti.ua.pt,rw"
+      device: ":/mnt/nfs/gitlab_p2/gitlab/data"
   gitlab_logs:
     driver: local
     driver_opts:
-      type: nfs4
-      o: "addr=192.168.85.141"
-      device: ":/gitlab-swarm/gitlab/logs"
+      type: nfs
+      o: "addr=srv2-deti.ua.pt,rw"
+      device: ":/mnt/nfs/gitlab_p2/gitlab/logs"
   gitlab_config:
     driver: local
     driver_opts:
-      type: nfs4
-      o: "addr=192.168.85.141"
-      device: ":/gitlab-swarm/gitlab/config"
+      type: nfs
+      o: "addr=srv2-deti.ua.pt,rw"
+      device: ":/mnt/nfs/gitlab_p2/gitlab/config"
   postgres_data:
     driver: local
     driver_opts:
-      type: nfs4
-      o: "addr=192.168.85.141"
-      device: :/gitlab-swarm/postgres 
+      type: nfs
+      o: "addr=srv2-deti.ua.pt,rw"
+      device: ":/mnt/nfs/gitlab_p2/postgres"
   prometheus_data:
     driver: local
     driver_opts:
-      type: nfs4
-      o: "addr=192.168.85.141"
-      device: ":/gitlab-swarm/prometheus"
+      type: nfs
+      o: "addr=srv2-deti.ua.pt,rw"
+      device: ":/mnt/nfs/gitlab_p2/prometheus"
   grafana_data:
     driver: local
     driver_opts:
-      type: nfs4
-      o: "addr=192.168.85.141"
-      device: ":/gitlab-swarm/grafana"
+      type: nfs
+      o: "addr=srv2-deti.ua.pt,rw"
+      device: ":/mnt/nfs/gitlab_p2/grafana"
 
 configs:
   gitlab.rb:
@@ -115,5 +101,5 @@ configs:
     file: "./grafana.ini"
 
 networks:
-  proxy:
+  gitlab_p2:
     external: true
