@@ -51,3 +51,11 @@ docker stack deploy -c stack.yml gitlab
 2. [How to install Traefik 2.x on a Docker Swarm](https://blog.creekorful.com/how-to-install-traefik-2-docker-swarm/)
 
 3. [Integrate Traefik 2.1 Reverse Proxy with Docker Swarm Services](https://medium.com/better-programming/traefik-2-1-as-a-reverse-proxy-c9e274da0a32)
+
+## Authors
+
+* **Catarina Silva** - [catarinaacsilva](https://github.com/catarinaacsilva)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
