@@ -19,7 +19,7 @@ services:
   redis:
     image: redis:5.0.8-alpine
   postgres:
-    image: postgres:12.2-alpine
+    image: postgres:11.7-alpine
     volumes:
       - postgres_data:/data
     environment:
@@ -59,31 +59,31 @@ volumes:
     driver: local
     driver_opts:
       type: nfs
-      o: "addr=srv2-deti.ua.pt,rw"
+      o: "addr=srv2-deti.ua.pt,rw,vers=4"
       device: ":/mnt/nfs/gitlab_p2/gitlab/data"
   gitlab_logs:
     driver: local
     driver_opts:
       type: nfs
-      o: "addr=srv2-deti.ua.pt,rw"
+      o: "addr=srv2-deti.ua.pt,rw,vers=4"
       device: ":/mnt/nfs/gitlab_p2/gitlab/logs"
   gitlab_config:
     driver: local
     driver_opts:
       type: nfs
-      o: "addr=srv2-deti.ua.pt,rw"
+      o: "addr=srv2-deti.ua.pt,rw,vers=4"
       device: ":/mnt/nfs/gitlab_p2/gitlab/config"
   postgres_data:
     driver: local
     driver_opts:
       type: nfs
-      o: "addr=srv2-deti.ua.pt,rw"
+      o: "addr=srv2-deti.ua.pt,rw,vers=4"
       device: ":/mnt/nfs/gitlab_p2/postgres"
   prometheus_data:
     driver: local
     driver_opts:
       type: nfs
-      o: "addr=srv2-deti.ua.pt,rw"
+      o: "addr=srv2-deti.ua.pt,rw,vers=4"
       device: ":/mnt/nfs/gitlab_p2/prometheus"
   grafana_data:
     driver: local
