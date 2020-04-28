@@ -28,27 +28,27 @@ def execute(usr, n):
     print(usr[0].get_name())
     if(n == 1):             # Create Project
         print("Create Project")
-        numProj = len(usr.get_all_projects())
-        usr.create_prj("proj"+str(numProj))
+        numProj = len(usr[0].get_all_projects())
+        usr[0].create_prj("proj"+str(numProj))
     elif(n == 2):           # Create File
         print("Create File")
-        prj = usr.get_rand_project()
-        nFiles = usr.get_nFC_project(prj)
-        usr.commit(prj, 'create', 'file' + str(nFiles) + '.txt', pathFile)
+        prj = usr[0].get_rand_project()
+        nFiles = usr[0].get_nFC_project(prj)
+        usr[0].commit(prj, 'create', 'file' + str(nFiles) + '.txt', pathFile)
     elif(n == 3):           # Update File
         print("Update File")
-        prj = usr.get_rand_project()
-        fName = usr.get_fileN_project(prj)
+        prj = usr[0].get_rand_project()
+        fName = usr[0].get_fileN_project(prj)
         if fName != 'FNF':
-            usr.commit(prj, 'update', fName, pathFile)
+            usr[0].commit(prj, 'update', fName, pathFile)
         else:
             print('File Not Found!')
     elif(n == 4):           # Delete File 
         print("Delete File")
-        prj = usr.get_rand_project()
-        fName = usr.get_fileN_project(prj)
+        prj = usr[0].get_rand_project()
+        fName = usr[0].get_fileN_project(prj)
         if fName != 'FNF':
-            usr.commit(prj, 'delete', fName)
+            usr[0].commit(prj, 'delete', fName, '')
         else:
             print('File Not Found!')
 

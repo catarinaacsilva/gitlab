@@ -2,8 +2,7 @@
 
 This README.md contains the necessary steps to deploy a high availability gitlab platform.
 The platform is deployed in a cluster of docker swarm machines.
-Furthermore, we include notes and relevant links that were used in the development of the project
-
+Furthermore, we include notes and relevant links that were used in the development of the project.
 
 ## Requirements
 
@@ -54,7 +53,7 @@ The docker swarm has currently three managers
 
 1. 10.1.0.1
 2. 10.2.0.1
-3. 10.4.0.1 
+3. 10.4.0.1
 
 There is a [swarmpit](https://swarmpit.io/) dashboard available:
 
@@ -76,11 +75,13 @@ The NFS server is in srv2-deti.
 The storage will be accessed at full speed if the containers are running in srv2-deti (compute2XX),
 but will be limited to 100Mbits/s if the containers are running at srv1 or srv4.
 
-You can mount the share in your laptop by issuing: sudo mount srv2-deti.ua.pt:
+You can mount the share in your laptop by issuing:
 
 ```bash
 sudo mkdir -p /mnt/nfs
 sudo mount -t nfs srv2-deti.ua.pt:/mnt/nfs /mnt/nfs
+
+193.136.82.36
 ```
 
 ## Deploy the service
@@ -132,12 +133,3 @@ docker stack deploy -c traefik.yml traefik
 2. [How to install Traefik 2.x on a Docker Swarm](https://blog.creekorful.com/how-to-install-traefik-2-docker-swarm/)
 
 3. [Integrate Traefik 2.1 Reverse Proxy with Docker Swarm Services](https://medium.com/better-programming/traefik-2-1-as-a-reverse-proxy-c9e274da0a32)
-
-
-## Authors
-
-* **Catarina Silva** - [catarinaacsilva](https://github.com/catarinaacsilva)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details

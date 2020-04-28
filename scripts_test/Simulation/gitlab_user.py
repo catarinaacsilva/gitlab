@@ -19,7 +19,7 @@ class GitlabUser:
 
     def __init__(self, name: str, url: str, token: str):
         self.name = str(name)
-        self.gl = gitlab.Gitlab(url, token)
+        self.gl = gitlab.Gitlab(url, private_token=token)
 
         # check if the user already exists
         if self.user_exists():
@@ -65,7 +65,7 @@ class GitlabUser:
 
     # random project 
     def get_rand_project(self):
-        return gl.projects.get(random.choice(self.user.projects.list()).id)
+        return self.gl.projects.get(random.choice(self.user.projects.list()).id)
 
     # commit (create/update/delete)
     def commit(self, project, action: str, file_path: str, content: str):
@@ -92,7 +92,7 @@ class GitlabUser:
                 }
             ]
         }
-        project.commits.update(data)
+        project.commits.create(data)
         
     # Number Files created
     def get_nFC_project(self, project):
