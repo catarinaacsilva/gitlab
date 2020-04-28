@@ -1,0 +1,105 @@
+version: "3.8"
+
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:11.11.4-ce.0
+    volumes:
+      - gitlab_data:/var/opt/gitlab
+      - gitlab_logs:/var/log/gitlab
+      - gitlab_config:/etc/gitlab
+    ports:
+      - 5122:22
+      - 5180:80
+    configs:
+      - source: gitlab.rb
+        target: /etc/gitlab/gitlab.rb
+    networks:
+      - default
+      - gitlab_p2
+  redis:
+    image: redis:5.0.8-alpine
+  postgres:
+    image: postgres:11.7-alpine
+    volumes:
+      - postgres_data:/data
+    environment:
+      POSTGRES_USER: gitlab
+      POSTGRES_PASSWORD: gitlab
+      PGDATA: /data
+      POSTGRES_DB: gitlab
+  prometheus:
+    image: prom/prometheus:latest
+    command: "--config.file=/prometheus.yaml --storage.tsdb.path /data"
+    volumes:
+      - "prometheus_data:/data"
+    configs:
+      - prometheus.yaml
+    networks:
+      - default
+      - gitlab_p2
+    ports:
+     - 5190:9090
+    user: root:root
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      GF_PATHS_CONFIG: "/grafana.ini"
+    configs:
+      - grafana.ini
+    volumes:
+      - "grafana_data:/data"
+    networks:
+      - default
+      - gitlab_p2
+    ports:
+      - 5130:3000
+
+volumes:
+  gitlab_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/nfs/gitlab_p2/gitlab/data
+  gitlab_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/nfs/gitlab_p2/gitlab/logs
+  gitlab_config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/nfs/gitlab_p2/gitlab/config
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/nfs/gitlab_p2/postgres
+  prometheus_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/nfs/gitlab_p2/prometheus
+  grafana_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/nfs/gitlab_p2/grafana
+
+configs:
+  gitlab.rb:
+    file: "./gitlab.rb"
+  prometheus.yaml:
+    file: "./prometheus.yml"
+  grafana.ini:
+    file: "./grafana.ini"
+
+networks:
+  gitlab_p2:
+    external: true

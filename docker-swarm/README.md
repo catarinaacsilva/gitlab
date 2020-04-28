@@ -80,9 +80,9 @@ You can mount the share in your laptop by issuing:
 ```bash
 sudo mkdir -p /mnt/nfs
 sudo mount -t nfs srv2-deti.ua.pt:/mnt/nfs /mnt/nfs
-
-193.136.82.36
 ```
+
+**srv2-deti.ua.pt**: 193.136.82.36
 
 ## Deploy the service
 
