@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   gitlab:
-    image: gitlab/gitlab-ce:11.11.4-ce.0
+    image: gitlab/gitlab-ce:12.9.4-ce.0
     volumes:
       - gitlab_data:/var/opt/gitlab
       - gitlab_logs:/var/log/gitlab
@@ -17,7 +17,7 @@ services:
       - default
       - gitlab_p2
   redis:
-    image: redis:5.0.8-alpine
+    image: redis:3.2.12-alpine
   postgres:
     image: postgres:11.7-alpine
     volumes:
@@ -28,7 +28,7 @@ services:
       PGDATA: /data
       POSTGRES_DB: gitlab
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v2.4.2
     command: "--config.file=/prometheus.yaml --storage.tsdb.path /data"
     volumes:
       - "prometheus_data:/data"
@@ -41,7 +41,7 @@ services:
      - 5190:9090
     user: root:root
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:6.7.3
     environment:
       GF_PATHS_CONFIG: "/grafana.ini"
     configs:
