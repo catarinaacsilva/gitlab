@@ -4,7 +4,7 @@
 -- Authors: Catarina Silva, 76399; Duarte Dias, 80214
 -- Emails: c.alexandracorreia@ua.pt; duarterochadias@ua.pt 
 
--- Version 2.0 
+-- Version 3.0 
 ---------------------------------------------------------------------------------------------------
 '''
 
@@ -19,7 +19,7 @@ class GitlabUser:
 
     def __init__(self, name: str, url: str, token: str):
         self.name = str(name)
-        self.gl = gitlab.Gitlab(url, private_token=token)
+        self.gl = gitlab.Gitlab(url, token)
 
         # check if the user already exists
         if self.user_exists():
@@ -55,13 +55,34 @@ class GitlabUser:
         self.user.projects.create({'name': project_name})
 
     # delete a project
-    def delete_prj(self, project_name: str):
-        project = self.gl.projects.list(search=project_name)
+    def delete_prj(self, project):
         project.delete()
 
     # list all projects id
     def get_all_projects(self):
         return self.user.projects.list()
+
+    # search for something
+    def search(self, project, topic: str):
+        return project.search(topic, topic)
+
+    # create issue
+    def create_issue(self, project):
+        n = len(project.issues.list())
+        project.issues.create({'title': 'bug'+str(n),'description': 'bug'+str(n)})
+
+    # close issue
+    def close_issue(self, issue):
+        issue.state_event = 'close'
+        issue.save()
+    
+    # random issue
+    def get_rand_issue(self, project): 
+        return project.issues.get(random.choice(project.issues.list()).id)
+
+    # get all issues id
+    def get_all_issues(self, project): 
+        return project.issues.list()
 
     # random project 
     def get_rand_project(self):
