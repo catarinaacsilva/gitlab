@@ -3,6 +3,14 @@
 external_url 'http://gitlab.local'
 registry_external_url 'http://registry.gitlab.local'
 
+# Disable e-mail
+gitlab_rails['gitlab_email_enabled'] = false
+
+# Reduce the amount of logs
+logging['svlogd_size'] = 2 * 1024 * 1024 # rotate after 2 MB of log data
+logging['svlogd_num'] = 3                # keep 3 rotated log files
+logging['logrotate_rotate'] = 3          # keep 3 rotated logs
+
 # Disable bundle services
 postgresql['enable'] = false
 redis['enable'] = false

@@ -5,7 +5,6 @@ services:
     image: gitlab/gitlab-ce:12.9.4-ce.0
     volumes:
       - gitlab_data:/var/opt/gitlab
-      - gitlab_logs:/var/log/gitlab
       - gitlab_config:/etc/gitlab
     ports:
       - 5122:22
@@ -16,17 +15,24 @@ services:
     networks:
       - default
       - gitlab_p2
+    deploy:
+      mode: replicated
+      replicas: 1
+  gitlab-runner:
+    image: gitlab/gitlab-runner:alpine
+    deploy:
+      mode: replicated
+      replicas: 4
   redis:
-    image: redis:3.2.12-alpine
+    image: redis:5.0.8-alpine
   postgres:
     image: postgres:11.7-alpine
     volumes:
       - postgres_data:/data
     environment:
-      POSTGRES_USER: gitlab
-      POSTGRES_PASSWORD: gitlab
-      PGDATA: /data
-      POSTGRES_DB: gitlab
+      - POSTGRES_USER=gitlab
+      - POSTGRES_PASSWORD=gitlab
+      - PGDATA=/data
   prometheus:
     image: prom/prometheus:v2.4.2
     command: "--config.file=/prometheus.yaml --storage.tsdb.path /data"
@@ -46,8 +52,6 @@ services:
       GF_PATHS_CONFIG: "/grafana.ini"
     configs:
       - grafana.ini
-    volumes:
-      - "grafana_data:/data"
     networks:
       - default
       - gitlab_p2
@@ -61,12 +65,6 @@ volumes:
       type: none
       o: bind
       device: /mnt/nfs/gitlab_p2/gitlab/data
-  gitlab_logs:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /mnt/nfs/gitlab_p2/gitlab/logs
   gitlab_config:
     driver: local
     driver_opts:
@@ -85,12 +83,6 @@ volumes:
       type: none
       o: bind
       device: /mnt/nfs/gitlab_p2/prometheus
-  grafana_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /mnt/nfs/gitlab_p2/grafana
 
 configs:
   gitlab.rb:

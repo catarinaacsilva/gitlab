@@ -104,7 +104,9 @@ sudo mkdir -p /mnt/nfs/gitlab_p2/gitlab/{data,logs,config}
 sudo mkdir -p /mnt/nfs/gitlab_p2/postgres
 sudo mkdir -p /mnt/nfs/gitlab_p2/grafana
 sudo mkdir -p /mnt/nfs/gitlab_p2/prometheus
-sudo chmod -R 777 /mnt/nfs/gitlab_p2/
+sudo mkdir -p /mnt/nfs/gitlab_p2/postgres_config
+sudo cp create-multiple-postgresql-databases.sh /mnt/nfs/gitlab_p2/postgres_config/
+sudo chmod -R 2777 /mnt/nfs/gitlab_p2/
 ```
 
 After that deploy the gitlab stack:
