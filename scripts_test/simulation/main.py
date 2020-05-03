@@ -153,8 +153,8 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Gitlab user simulation', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-u', type=str, default='http://host.docker.internal:8000', help='Gitlab address')
-    parser.add_argument('-t', type=str, default='dLzcm6MGPyV5FbykEtQ3', help='Gitlab private token')
+    parser.add_argument('-u', type=str, default='http://10.2.0.1:5180', help='Gitlab address')
+    parser.add_argument('-t', type=str, default='XrFqxU1e-u8-9GVvyWMS', help='Gitlab private token')
     parser.add_argument('-f', type=str, default='file.txt', help='Path to file')
     parser.add_argument('-d', type=int, default=3, help='Number of threads (< n_users)')
     parser.add_argument('-r', type=int, default=100, help='Number of repetitions')
