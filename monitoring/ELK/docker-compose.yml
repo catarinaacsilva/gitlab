@@ -13,6 +13,7 @@ services:
      - "9300:9300"
    environment:
      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+     ELASTIC_PASSWORD: gitlab
      discovery.type: single-node
    networks:
      - elk_stack
@@ -20,8 +21,12 @@ services:
  logstash:
    build:
      context: logstash/
+   command: logstash -f ./pipeline/logstash.conf
+   volumes:
+     - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
    ports:
-     - "5000:5000/udp"
+     - "5000:5000"
+     - "5114:5114"
      - "9600:9600"
    environment:
      LS_JAVA_OPTS: "-Xmx256m -Xms256m"

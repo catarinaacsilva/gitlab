@@ -35,16 +35,16 @@ Monitoring Gitlab logs and network status (SNMP)
 2. Elasticsearch
 	- Ports: 9200, 9300
 3. Logstash
-	- Ports: 5000, 6000/UDP, 9600
+	- Ports: 5000, 5114, 9600
 
 ## Logstash Inputs
 
 1. Syslog
-	- Receives logs from Gitlab - through port 6000 (udp)
+	- Receives logs from Gitlab - through port 5114 (tcp)
 2. SNMP
-	- Receives SNMP messages that indicate the state of the network
+	- Receives SNMP messages that indicate the state of the devices
 	- host: "udp:10.2.0.", community: "gicgirs", version: "2c" 
-	- IOD's: ".1.3.6.1.2.1.1.4.0", ".1.3.6.1.2.1.1.5.0" (still to choose)
+	- IOD's: ".1.3.6.1.4.1.2021.11.10.0", ".1.3.6.1.4.1.2021.11.11.0", ".1.3.6.1.4.1.2021.9.1.9.9", ".1.3.6.1.4.1.2021.4.5.0", ".1.3.6.1.4.1.2021.4.6.0"
 
 ## Installing ELK Stack
 
@@ -55,11 +55,7 @@ Monitoring Gitlab logs and network status (SNMP)
 [SNMP](https://www.elastic.co/guide/en/logstash/current/plugins-inputs-snmp.html)
 [Syslog](https://www.elastic.co/guide/en/logstash/current/plugins-inputs-syslog.html)
 
-
 ## Authors
 
-* **Catarina Silva** - [catarinaacsilva](https://github.com/catarinaacsilva)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+- **Catarina Silva**
+- **Duarte Dias**
