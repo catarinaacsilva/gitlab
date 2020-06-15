@@ -55,7 +55,11 @@ Monitoring Gitlab logs and network status (SNMP)
 [SNMP](https://www.elastic.co/guide/en/logstash/current/plugins-inputs-snmp.html)
 [Syslog](https://www.elastic.co/guide/en/logstash/current/plugins-inputs-syslog.html)
 
+
 ## Authors
 
-- **Catarina Silva**
-- **Duarte Dias**
+* **Catarina Silva** - [catarinaacsilva](https://github.com/catarinaacsilva)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
