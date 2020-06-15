@@ -1,0 +1,39 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # gitlab monitor
+  - job_name: 'gitlab_monitor'
+    static_configs:
+      - targets: ['gitlab:9168']
+
+  # gitlab sidekiq
+  - job_name: 'gitlab_sidekiq'
+    metrics_path: /sidekiq
+    static_configs:
+      - targets: ['gitlab:9168']
+
+  # gitlab process
+  - job_name: 'gitlab_process'
+    metrics_path: /process
+    static_configs:
+      - targets: ['gitlab:9168']
+
+  # gitlab pages
+  - job_name: 'gitlab_pages'
+    static_configs:
+      - targets: ['gitlab:9235']
+
+  # gitaly
+  - job_name: gitaly
+    static_configs:
+      - targets: ['gitlab:9236']
+
+  # gitlab workhorse
+  - job_name: workhorse
+    static_configs:
+      - targets: ['gitlab:9229']

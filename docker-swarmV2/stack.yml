@@ -1,0 +1,313 @@
+version: "3.8"
+
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:13.0.6-ce.0
+    volumes:
+      - gitlab_data:/var/opt/gitlab
+      - gitlab_config:/etc/gitlab
+    ports:
+      - 5122:22
+      - 5180:80
+    configs:
+      - source: gitlab.rb
+        target: /etc/gitlab/gitlab.rb
+    networks:
+      - default
+      - gitlab_p2
+    deploy:
+      mode: replicated
+      replicas: 1
+      #labels:
+      #  - "traefik.enable=true"
+      #  - "traefik.docker.lbswarm=true"
+      #  - "traefik.http.services.gitlab.loadbalancer.server.port=80"
+      #  - "traefik.http.routers.gitlab.entrypoints=web"
+      #  - "traefik.http.routers.gitlab.rule=Host(`swarm.local`) && PathPrefix(`/gitlab`)"
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://10.5.0.7:5114"
+        tag: "gitlab"
+  
+  gitlab-runner:
+    image: gitlab/gitlab-runner:alpine
+    deploy:
+      mode: replicated
+      replicas: 4
+  
+  redis:
+    image: bitnami/redis:6.0.5
+    environment:
+      - REDIS_REPLICATION_MODE=master
+      - REDIS_PASSWORD=str0ng_passw0rd
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://10.5.0.7:5114"
+        tag: "redis"
+  
+  redis-slave:
+    image: bitnami/redis:6.0.5
+    environment:
+      - REDIS_REPLICATION_MODE=slave
+      - REDIS_MASTER_HOST=redis
+      - REDIS_MASTER_PASSWORD=str0ng_passw0rd
+      - REDIS_PASSWORD=str0ng_passw0rd
+    deploy:
+      mode: replicated
+      replicas: 2
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://10.5.0.7:5114"
+        tag: "redis-slave"
+  
+  redis-sentinel-0:
+    image: bitnami/redis-sentinel:6.0.5
+    environment:
+      - REDIS_MASTER_PASSWORD=str0ng_passw0rd
+      - REDIS_MASTER_SET=gitlab-redis
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://10.5.0.7:5114"
+        tag: "redis-sentinel-0"
+
+  redis-sentinel-1:
+    image: bitnami/redis-sentinel:6.0.5
+    environment:
+      - REDIS_MASTER_PASSWORD=str0ng_passw0rd
+      - REDIS_MASTER_SET=gitlab-redis
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://10.5.0.7:5114"
+        tag: "redis-sentinel-1"
+
+  redis-sentinel-2:
+    image: bitnami/redis-sentinel:6.0.5
+    environment:
+      - REDIS_MASTER_PASSWORD=str0ng_passw0rd
+      - REDIS_MASTER_SET=gitlab-redis
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://10.5.0.7:5114"
+        tag: "redis-sentinel-2"
+  
+  pg-0:
+    hostname: 'pg-0'
+    image: bitnami/postgresql-repmgr:11.8.0
+    environment:
+    - POSTGRESQL_POSTGRES_PASSWORD=adminpassword
+    - POSTGRESQL_USERNAME=gitlab
+    - POSTGRESQL_PASSWORD=gitlab
+    - POSTGRESQL_DATABASE=gitlab
+    - REPMGR_PASSWORD=repmgrpassword
+    - REPMGR_PRIMARY_HOST=pg-0
+    - REPMGR_PARTNER_NODES=pg-0,pg-1
+    - REPMGR_NODE_NAME=pg-0
+    - REPMGR_NODE_NETWORK_NAME=pg-0
+    volumes:
+    - pg0:/bitnami/postgresql
+    networks:
+    - default
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://10.5.0.7:5114"
+        tag: "pg-0"
+
+  pg-1:
+    image: bitnami/postgresql-repmgr:11.8.0
+    environment:
+    - POSTGRESQL_POSTGRES_PASSWORD=adminpassword
+    - POSTGRESQL_USERNAME=gitlab
+    - POSTGRESQL_PASSWORD=gitlab
+    - POSTGRESQL_DATABASE=gitlab
+    - REPMGR_PASSWORD=repmgrpassword
+    - REPMGR_PRIMARY_HOST=pg-0
+    - REPMGR_PARTNER_NODES=pg-0,pg-1
+    - REPMGR_NODE_NAME=pg-1
+    - REPMGR_NODE_NETWORK_NAME=pg-1
+    volumes:
+    - pg1:/bitnami/postgresql
+    networks:
+    - default
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://10.5.0.7:5114"
+        tag: "pg-1"
+
+  pgpool:
+    image: bitnami/pgpool:4.1.2
+    environment:
+    - PGPOOL_BACKEND_NODES=0:pg-0:5432,1:pg-1:5432
+    - PGPOOL_SR_CHECK_USER=gitlab
+    - PGPOOL_SR_CHECK_PASSWORD=gitlab
+    - PGPOOL_ENABLE_LDAP=no
+    - PGPOOL_POSTGRES_USERNAME=postgres
+    - PGPOOL_POSTGRES_PASSWORD=adminpassword
+    - PGPOOL_ADMIN_USERNAME=admin
+    - PGPOOL_ADMIN_PASSWORD=adminpassword
+    ports:
+    - 5154:5432 
+    networks:
+    - default
+    - gitlab_p2
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://10.5.0.7:5114"
+        tag: "pgpool"
+  
+  prometheus:
+    image: prom/prometheus:v2.19.0
+    command: "--web.external-url=http://swarm.local:5180/prometheus --config.file=/prometheus.yaml --storage.tsdb.path /data"
+    volumes:
+      - "prometheus_data:/data"
+    configs:
+      - prometheus.yaml
+    networks:
+      - default
+      - gitlab_p2
+    user: root:root
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.lbswarm=true"
+        - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+        - "traefik.http.routers.prometheus.entrypoints=web"
+        - "traefik.http.routers.prometheus.rule=Host(`swarm.local`) && PathPrefix(`/prometheus`)"
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://10.5.0.7:5114"
+        tag: "prometheus"
+  
+  grafana:
+    image: grafana/grafana:6.7.4
+    environment:
+      GF_PATHS_CONFIG: "/grafana.ini"
+    configs:
+      - grafana.ini
+    networks:
+      - default
+      - gitlab_p2
+    deploy:
+      mode: replicated
+      replicas: 2
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.lbswarm=true"
+        - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+        - "traefik.http.routers.grafana.entrypoints=web"
+        - "traefik.http.routers.grafana.rule=Host(`swarm.local`) && PathPrefix(`/grafana/`)"
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://10.5.0.7:5114"
+        tag: "grafana"
+  
+  traefik:
+    image: traefik:v2.2.1
+    command:
+      - --api=true # enable the management api
+      - --api.dashboard=true # enable the monitoring dashboard
+      - --api.insecure=true # allow insecure access to the dashboard
+      - --providers.docker=true # use docker
+      - --providers.docker.swarmMode=true # in swarm mode
+      - --providers.docker.exposedbydefault=false # but don't pick up services automatically
+      - --entrypoints.web.address=:80 # define `web` entry point listening at port 80
+    ports:
+      - 5100:80
+      - 5188:8080 # dashboard
+    volumes:
+      # must mount the docker socket so that traefik can listen to changes
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      # this basically says that only deploy 1 per node in every manager node
+      # and reserve 128MB of ram to it, also limit the memory to 256MB
+      mode: global
+      placement:
+        constraints:
+          - "node.role == manager"
+      resources:
+        reservations:
+          memory: 128M
+        limits:
+          memory: 256M
+    networks:
+      - gitlab_p2
+      - default
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://10.5.0.7:5114"
+        tag: "traefik"
+
+volumes:
+  gitlab_data:
+    driver: local
+    #driver_opts:
+    #  type: none
+    #  o: bind
+    #  device: /mnt/nfs/gitlab_p2/gitlab/data
+    driver_opts:
+      type: nfs
+      o: "addr=srv2-deti.ua.pt,rw,vers=4"
+      device: ":/mnt/nfs/gitlab_p2/gitlab/data"
+  gitlab_config:
+    driver: local
+    #driver_opts:
+    #  type: none
+    #  o: bind
+    #  device: /mnt/nfs/gitlab_p2/gitlab/config
+    driver_opts:
+      type: nfs
+      o: "addr=srv2-deti.ua.pt,rw,vers=4"
+      device: ":/mnt/nfs/gitlab_p2/gitlab/config"
+  pg0:
+    driver: local
+    #driver_opts:
+    #  type: none
+    #  o: bind
+    #  device: /mnt/nfs/gitlab_p2/pg/pg0
+    driver_opts:
+      type: nfs
+      o: "addr=srv2-deti.ua.pt,rw,vers=4"
+      device: ":/mnt/nfs/gitlab_p2/pg/pg0"
+  pg1:
+    driver: local
+    #driver_opts:
+    #  type: none
+    #  o: bind
+    #  device: /mnt/nfs/gitlab_p2/pg/pg1
+    driver_opts:
+      type: nfs
+      o: "addr=srv2-deti.ua.pt,rw,vers=4"
+      device: ":/mnt/nfs/gitlab_p2/pg/pg1"
+  prometheus_data:
+    driver: local
+    #driver_opts:
+    #  type: none
+    #  o: bind
+    #  device: /mnt/nfs/gitlab_p2/prometheus
+    driver_opts:
+      type: nfs
+      o: "addr=srv2-deti.ua.pt,rw,vers=4"
+      device: ":/mnt/nfs/gitlab_p2/prometheus"
+
+configs:
+  gitlab.rb:
+    file: "./gitlab.rb"
+  prometheus.yaml:
+    file: "./prometheus.yml"
+  grafana.ini:
+    file: "./grafana.ini"
+
+networks:
+  gitlab_p2:
+    external: true

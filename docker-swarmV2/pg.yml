@@ -1,0 +1,82 @@
+version: "3.8"
+
+services:
+  pg-0:
+    hostname: 'pg-0'
+    image: bitnami/postgresql-repmgr:11.8.0
+    environment:
+    - POSTGRESQL_POSTGRES_PASSWORD=adminpassword
+    - POSTGRESQL_USERNAME=gitlab
+    - POSTGRESQL_PASSWORD=gitlab
+    - POSTGRESQL_DATABASE=gitlab
+    - REPMGR_PASSWORD=repmgrpassword
+    - REPMGR_PRIMARY_HOST=pg-0
+    - REPMGR_PARTNER_NODES=pg-0,pg-1
+    - REPMGR_NODE_NAME=pg-0
+    - REPMGR_NODE_NETWORK_NAME=pg-0
+    ports:
+    - 5132:5432
+    volumes:
+    - pg0:/bitnami/postgresql
+    networks:
+    - default
+
+  pg-1:
+    image: bitnami/postgresql-repmgr:11.8.0
+    environment:
+    - POSTGRESQL_POSTGRES_PASSWORD=adminpassword
+    - POSTGRESQL_USERNAME=gitlab
+    - POSTGRESQL_PASSWORD=gitlab
+    - POSTGRESQL_DATABASE=gitlab
+    - REPMGR_PASSWORD=repmgrpassword
+    - REPMGR_PRIMARY_HOST=pg-0
+    - REPMGR_PARTNER_NODES=pg-0,pg-1
+    - REPMGR_NODE_NAME=pg-1
+    - REPMGR_NODE_NETWORK_NAME=pg-1
+    volumes:
+    - pg1:/bitnami/postgresql
+    networks:
+    - default
+
+  pgpool:
+    image: bitnami/pgpool:4.1.2
+    environment:
+    - PGPOOL_BACKEND_NODES=0:pg-0:5432,1:pg-1:5432
+    - PGPOOL_SR_CHECK_USER=gitlab
+    - PGPOOL_SR_CHECK_PASSWORD=gitlab
+    - PGPOOL_ENABLE_LDAP=no
+    - PGPOOL_POSTGRES_USERNAME=postgres
+    - PGPOOL_POSTGRES_PASSWORD=adminpassword
+    - PGPOOL_ADMIN_USERNAME=admin
+    - PGPOOL_ADMIN_PASSWORD=adminpassword
+    ports:
+    - 5154:5432 
+    networks:
+    - default
+    - gitlab_p2
+
+networks:
+  gitlab_p2:
+    external: true
+
+volumes:
+  pg0:
+    driver: local
+    #driver_opts:
+    #  type: none
+    #  o: bind
+    #  device: /mnt/nfs/gitlab_p2/pg/pg0
+    driver_opts:
+      type: nfs
+      o: "addr=srv2-deti.ua.pt,rw,vers=4"
+      device: ":/mnt/nfs/gitlab_p2/pg/pg0"
+  pg1:
+    driver: local
+    #driver_opts:
+    #  type: none
+    #  o: bind
+    #  device: /mnt/nfs/gitlab_p2/pg/pg1
+    driver_opts:
+      type: nfs
+      o: "addr=srv2-deti.ua.pt,rw,vers=4"
+      device: ":/mnt/nfs/gitlab_p2/pg/pg1"
