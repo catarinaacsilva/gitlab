@@ -1,4 +1,6 @@
-# Deploy GitLab in a Docker swarm
+# GitLab Scaling High Availability
+
+In this repository you can see a simple and initial deploy of GitLab on docker-compose. The main idea was to deploy on swarm cluster.
 
 You can easily configure and deploy your Docker-based GitLab installation in a swarm cluster.
 
